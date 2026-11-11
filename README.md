@@ -7,22 +7,13 @@ Feito como parte dos meus estudos para a certificação **AWS Certified Cloud Pr
 
 ## Arquitetura
 
-```mermaid
-flowchart LR
-  U([Visitante]) -->|HTTP 80| EC2
-  subgraph AWS[us-east-1]
-    S3[(Bucket S3 privado<br/>versionamento + lifecycle)]
-    subgraph EC2[Instância EC2 lab-app]
-      N[nginx]
-      R[Disco raiz EBS 8 GiB]
-      D[Volume EBS /dados 1 GiB]
-    end
-    ROLE[Role IAM<br/>somente leitura] -.->|credenciais temporárias| EC2
-    EC2 -->|aws s3 sync| S3
-    D -->|snapshot| SNAP[(Snapshot EBS)]
-    SNAP -->|novo volume| REST[Volume restaurado]
-  end
-```
+Visitante ──HTTP 80──▶ EC2 (nginx)
+                        │  usa a role (crachá) para ler
+                        ▼
+                  Bucket S3 privado ── versionamento + lifecycle
+                        
+EC2 ── disco raiz (sistema)
+    └─ volume EBS /dados (pedidos) ──snapshot──▶ backup ──▶ volume restaurado
 
 ## Serviços e conceitos praticados
 
